@@ -15,9 +15,14 @@ class TodayBloc extends Bloc<TodayEvent, TodayState> {
     LoadCachedCatEvent event,
     Emitter<TodayState> emit,
   ) async {
-    final cached = await repository.getCachedCatImage();
-    if (cached != null) {
-      emit(TodayLoaded(cached));
+    final lastCachedImage = await repository.getCachedCatImage();
+
+    if (lastCachedImage != null &&
+        lastCachedImage.downloadedAt != null &&
+        _isToday(lastCachedImage.downloadedAt!)) {
+      emit(TodayLoaded(lastCachedImage));
+    } else {
+      add(const FetchNewCatEvent());
     }
   }
 
@@ -26,11 +31,18 @@ class TodayBloc extends Bloc<TodayEvent, TodayState> {
     Emitter<TodayState> emit,
   ) async {
     emit(const TodayLoading());
-    final cat = await repository.fetchAndCacheCatImage();
-    if (cat != null) {
-      emit(TodayLoaded(cat));
+    final catImage = await repository.fetchAndCacheCatImage();
+    if (catImage != null) {
+      emit(TodayLoaded(catImage));
     } else {
       emit(const TodayError('Не удалось загрузить изображение'));
     }
+  }
+
+  bool _isToday(DateTime date) {
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 }

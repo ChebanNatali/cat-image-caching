@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:catimage/features/data/models/cat_model.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -32,12 +32,5 @@ class LocalStorage {
     return list
         .map((e) => CatModel.fromCacheJson(e as Map<String, dynamic>))
         .toList();
-  }
-
-  Future<String> saveImageFile(String fileName, List<int> bytes) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/$fileName');
-    await file.writeAsBytes(bytes);
-    return file.path;
   }
 }

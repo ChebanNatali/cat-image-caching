@@ -8,6 +8,7 @@ class CatModel extends CatEntity {
     required super.url,
     required super.mimetype,
     super.localPath,
+    super.downloadedAt,
   });
 
   factory CatModel.fromJson(Map<String, dynamic> json) {
@@ -20,7 +21,20 @@ class CatModel extends CatEntity {
     );
   }
 
-  CatModel copyWith({String? localPath}) {
+  factory CatModel.fromCacheJson(Map<String, dynamic> json) {
+    final downloadedAtRaw = json['downloaded_at'] as String?;
+    return CatModel(
+      id: json['id'] as String,
+      tags: List<String>.from(json['tags'] as List),
+      createdAt: json['created_at'] as String,
+      url: json['url'] as String,
+      mimetype: json['mimetype'] as String,
+      localPath: json['local_path'] as String?,
+      downloadedAt: downloadedAtRaw != null ? DateTime.parse(downloadedAtRaw) : null,
+    );
+  }
+
+  CatModel copyWith({String? localPath, DateTime? downloadedAt}) {
     return CatModel(
       id: id,
       tags: tags,
@@ -28,6 +42,7 @@ class CatModel extends CatEntity {
       url: url,
       mimetype: mimetype,
       localPath: localPath ?? this.localPath,
+      downloadedAt: downloadedAt ?? this.downloadedAt,
     );
   }
 
@@ -38,16 +53,6 @@ class CatModel extends CatEntity {
         'url': url,
         'mimetype': mimetype,
         'local_path': localPath,
+        'downloaded_at': downloadedAt?.toIso8601String(),
       };
-
-  factory CatModel.fromCacheJson(Map<String, dynamic> json) {
-    return CatModel(
-      id: json['id'] as String,
-      tags: List<String>.from(json['tags'] as List),
-      createdAt: json['created_at'] as String,
-      url: json['url'] as String,
-      mimetype: json['mimetype'] as String,
-      localPath: json['local_path'] as String?,
-    );
-  }
 }
