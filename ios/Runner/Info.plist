@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.catimage.fetch_every_fifteen_minutes</string>
+		<string>com.catimage.fetch_every_two_hours</string>
+		<string>com.catimage.fetch_once_today</string>
+	</array>
 </dict>
 </plist>

@@ -1,3 +1,4 @@
+import 'package:catimage/background/background_worker.dart';
 import 'package:catimage/core/core.dart';
 import 'package:catimage/di_container.dart';
 import 'package:catimage/features/presentation/bloc/history/history_bloc.dart';
@@ -11,6 +12,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
+  await BackgroundWorker.initialize();
+  // await BackgroundWorker.registerEveryFifteenMinutes();тест: каждые 15 минут
+  // await BackgroundWorker.registerEveryTwoHours(); // тест: каждые 2 часа
+  await BackgroundWorker.registerOnceToday(); // раз в сутки
   runApp(const MyApp());
 }
 

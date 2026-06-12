@@ -24,26 +24,42 @@ class CatRepositoryImpl implements CatRepository {
     final imageBytes = await remoteDatasource.downloadImageById(catModel.id);
     if (imageBytes == null) return null;
 
-    final localPath = await Core.utils.saveImageFile(
+    final fileName = await Core.utils.saveImageFile(
       '${catModel.id}.jpeg',
       imageBytes,
     );
-    final newCatImage = catModel.copyWith(
-      localPath: localPath,
+    final modelToStore = catModel.copyWith(
+      localPath: fileName,
       downloadedAt: DateTime.now(),
     );
 
-    await localStorage.saveCatData(newCatImage);
+    await localStorage.saveCatData(modelToStore);
 
-    final history = await localStorage.getHistory();
-    history.add(newCatImage);
-    await localStorage.saveHistory(history);
+    try {
+      final history = await localStorage.getHistory();
+      history.add(modelToStore);
+      await localStorage.saveHistory(history);
+    } catch (_) {
+      await localStorage.saveHistory([modelToStore]);
+    }
 
-    return newCatImage;
+    final fullPath = await Core.utils.resolveImagePath(fileName);
+    return modelToStore.copyWith(localPath: fullPath);
   }
 
   @override
-  Future<List<CatEntity>> getHistory() => localStorage.getHistory();
+  Future<List<CatEntity>> getHistory() async {
+    final items = await localStorage.getHistory();
+    final result = <CatEntity>[];
+    for (final item in items) {
+      if (item.localPath == null) continue;
+      final fullPath = await Core.utils.resolveImagePath(item.localPath!);
+      if (await File(fullPath).exists()) {
+        result.add(item.copyWith(localPath: fullPath));
+      }
+    }
+    return result;
+  }
 
   @override
   Future<CatEntity?> getCachedCatImage() async {
@@ -53,9 +69,10 @@ class CatRepositoryImpl implements CatRepository {
     final json = jsonDecode(jsonData) as Map<String, dynamic>;
     final model = CatModel.fromCacheJson(json);
 
-    if (model.localPath == null || !File(model.localPath!).existsSync()) {
-      return null;
-    }
-    return model;
+    if (model.localPath == null) return null;
+    final fullPath = await Core.utils.resolveImagePath(model.localPath!);
+    if (!await File(fullPath).exists()) return null;
+
+    return model.copyWith(localPath: fullPath);
   }
 }

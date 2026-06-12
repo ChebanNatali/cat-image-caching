@@ -14,6 +14,7 @@ class TodayTab extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Core.colors.backgroundColor,
         title: const Text('Сегодня'),
+        centerTitle: true,
       ),
       body: BlocBuilder<TodayBloc, TodayState>(
         builder: (context, state) {
@@ -33,7 +34,7 @@ class TodayTab extends StatelessWidget {
           _DownloadedAtBadge(downloadedAt: state.cat.downloadedAt),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: Core.constants.paddingH16B16,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.file(
@@ -49,10 +50,10 @@ class TodayTab extends StatelessWidget {
     if (state is TodayError) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: Core.constants.paddingAll16,
           child: Text(
             state.message,
-            style: const TextStyle(color: Colors.red),
+            style: Core.theme.text.errorText,
             textAlign: TextAlign.center,
           ),
         ),
@@ -71,14 +72,14 @@ class _DownloadedAtBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     if (downloadedAt == null) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: Core.constants.paddingH16T12B4,
       child: Row(
         children: [
           Icon(Icons.access_time, size: 14, color: Core.colors.mainColor),
           const SizedBox(width: 4),
           Text(
             Core.utils.formatDateTimeWithTime(downloadedAt!),
-            style: TextStyle(fontSize: 13, color: Core.colors.mainColor),
+            style: Core.theme.text.badgeText,
           ),
         ],
       ),

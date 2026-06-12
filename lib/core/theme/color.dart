@@ -22,4 +22,8 @@ class AppColors {
   Color get cyan064 => const Color(0xFF006064);
 
   Color get cyan5FF => const Color(0xFF00E5FF);
+
+  Color get cyan8D4 => const Color(0xFF00B8D4);
+
+  Color get lBlue79B => const Color(0xFF01579B);
 }

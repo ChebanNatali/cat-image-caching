@@ -1,3 +1,4 @@
+import 'package:catimage/core/core.dart';
 import 'package:catimage/features/domain/repositories/cat_repository.dart';
 import 'package:catimage/features/presentation/bloc/today/today_event.dart';
 import 'package:catimage/features/presentation/bloc/today/today_state.dart';
@@ -11,25 +12,22 @@ class TodayBloc extends Bloc<TodayEvent, TodayState> {
     on<FetchNewCatEvent>(_onFetchNew);
   }
 
-  Future<void> _onLoadCached(
-    LoadCachedCatEvent event,
-    Emitter<TodayState> emit,
-  ) async {
+  Future<void> _onLoadCached(LoadCachedCatEvent event,
+      Emitter<TodayState> emit,) async {
     final lastCachedImage = await repository.getCachedCatImage();
 
     if (lastCachedImage != null &&
         lastCachedImage.downloadedAt != null &&
-        _isToday(lastCachedImage.downloadedAt!)) {
+        //Core.utils.isToday(lastCachedImage.downloadedAt!)) {
+        Core.utils.isWithinLastHalfHour(lastCachedImage.downloadedAt!)) {
       emit(TodayLoaded(lastCachedImage));
     } else {
       add(const FetchNewCatEvent());
     }
   }
 
-  Future<void> _onFetchNew(
-    FetchNewCatEvent event,
-    Emitter<TodayState> emit,
-  ) async {
+  Future<void> _onFetchNew(FetchNewCatEvent event,
+      Emitter<TodayState> emit,) async {
     emit(const TodayLoading());
     final catImage = await repository.fetchAndCacheCatImage();
     if (catImage != null) {
@@ -37,12 +35,5 @@ class TodayBloc extends Bloc<TodayEvent, TodayState> {
     } else {
       emit(const TodayError('Не удалось загрузить изображение'));
     }
-  }
-
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
   }
 }
