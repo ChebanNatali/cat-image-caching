@@ -21,6 +21,10 @@ class CatRepositoryImpl implements CatRepository {
     final catModel = await remoteDatasource.fetchCatImage();
     if (catModel == null) return null;
 
+    final history = await localStorage.getHistory();
+    final isDuplicate = history.any((e) => e.id == catModel.id);
+    if (isDuplicate) return getCachedCatImage();
+
     final imageBytes = await remoteDatasource.downloadImageById(catModel.id);
     if (imageBytes == null) return null;
 
@@ -36,7 +40,6 @@ class CatRepositoryImpl implements CatRepository {
     await localStorage.saveCatData(modelToStore);
 
     try {
-      final history = await localStorage.getHistory();
       history.add(modelToStore);
       await localStorage.saveHistory(history);
     } catch (_) {
